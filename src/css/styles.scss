@@ -1,0 +1,67 @@
+* {
+  box-sizing: border-box;
+}
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #eee;
+  font-family: Roboto, sans-serif;
+}
+.App {
+  width: 400px;
+  margin: 3em auto;
+  padding: 20px;
+  box-shadow: 3px 3px 0 darkblue;
+  background-color: white;
+  border: 5px double blue;
+}
+h1.title {
+  color: darkblue;
+  font-size: 2em;
+  text-align: center;
+  text-shadow: 2px 2px #eee;
+  padding-bottom: 1em;
+  border-bottom: 3px double blue;
+}
+div.game-board {
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
+  justify-content: space-between;
+  margin: 0 auto;
+}
+div.game-board div.cell {
+  margin: 1%;
+  height: 125px;
+  width: 30%;
+  border: 1px solid #eee;
+  box-shadow: 2px 2px 0 darkblue;
+}
+div.marker {
+  text-align: center;
+  font-size: 4em;
+  padding-top: 30px;
+  line-height: 1em;
+  color: darkblue;
+  text-shadow: 3px 3px aqua;
+}
+.game-state {
+  margin: 1em 0;
+  font-weight: bold;
+}
+.controls {
+  display: flex;
+  justify-content: space-between;
+  margin: 20px 0 0 0;
+}
+.controls button {
+  font-size: 1.2em;
+  width: 50%;
+}
+.controls button:nth-child(1) {
+  margin-right: .25em;
+}
+.controls button:nth-child(2) {
+  margin-left: .25em;
+}
