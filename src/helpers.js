@@ -8,7 +8,7 @@ export const gameBoard = {
   7: '',
   8: '',
   9: ''
-}
+};
 export const winners = [
   [1, 2, 3],
   [1, 4, 6],
@@ -18,4 +18,5 @@ export const winners = [
   [3, 5, 7],
   [4, 5, 6],
   [7, 8, 9]
-]
+];
+export const getRandomNum = () => Math.floor(Math.random() * 10);

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import './css/styles.css';
-import { gameBoard, winners } from './helpers';
+import { gameBoard, winners, getRandomNum } from './helpers';
 
 import Cell from './components/Cell';
 import Button from './components/Button';
@@ -12,7 +12,8 @@ class App extends Component {
     this.state = {
       gameBoard: gameBoard,
       currentPlayer: '',
-      gameState: 'idle'
+      gameState: 'idle',
+      players: 1
     }
 
     this.checkForWinner = this.checkForWinner.bind(this);
@@ -21,27 +22,39 @@ class App extends Component {
     this.endGame = this.endGame.bind(this);
     this.reset = this.reset.bind(this);
   }
-  checkForWinner(currentPlayer) {
-    for (let i = 0; i < winners.length; i++) {
-
-    }
+  checkForWinner(currentPlayer, gameBoard) {
     // Compare current board against winners
     // If current player has a winning hand, show end state
   }
   handleClick(tile) {
-    const marker = this.state.currentPlayer;
-    const gameBoard = {...this.state.gameBoard};
-    gameBoard[tile] = marker;
+    let gameBoard = {...this.state.gameBoard};
+    gameBoard[tile] = this.state.currentPlayer;
+    const currentPlayer = this.state.currentPlayer === 'X' ? 'O' : 'X';
+    this.setState({
+      gameBoard,
+      currentPlayer
+    });
 
     // Check or a winner with new game board and current player
-    this.checkForWinner(this.state.currentPlayer, gameBoard);
+    this.checkForWinner(currentPlayer, gameBoard);
 
-    // Switch players
-    let currentPlayer;
-    if (this.state.gameState === 'playing') {
-      currentPlayer = marker === 'X' ? 'O' : 'X';
+    // Let the computer play a round
+    if (this.state.gameState === 'playing' && this.state.players === 1) {
+      this.playComputerRound(currentPlayer, gameBoard);
     }
+  }
+  playComputerRound(currentPlayer, gameBoard) {
+    // Pick a new space not yet selected
+    let tile = 0;
+    while ((tile > Object.keys(gameBoard).length || tile <= 0) && gameBoard[tile] !== '') {
+      tile = getRandomNum();
+    }
+    gameBoard[tile] = currentPlayer;
 
+    // See if the computer is a winner
+    this.checkForWinner(currentPlayer, gameBoard);
+
+    currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
     this.setState({
       gameBoard,
       currentPlayer
@@ -116,6 +129,7 @@ class App extends Component {
       case ('finished'):
         info = `${this.state.currentPlayer} wins! Play again?`;
         gameState = newGameButton;
+        break;
       default:
         gameState = newGameButton;
         break;
@@ -141,12 +155,12 @@ class App extends Component {
           {info}
         </div>
         <div className="controls">
-          {gameState}
           <Button
             text="Reset"
             style={buttonStyle}
             action={this.reset}
           />
+          {gameState}
         </div>
       </div>
     );
