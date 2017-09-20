@@ -163,6 +163,7 @@ class App extends Component {
                 cellInfo={cell}
                 cellNum={i}
                 style={cell.style}
+                gameStatus={this.state.gameStatus}
                 handleClick={this.handleClick}
                 key={i}
               />

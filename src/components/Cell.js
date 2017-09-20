@@ -9,20 +9,26 @@ class Cell extends React.Component {
     this.handleClick = this.props.handleClick;
   }
   render() {
-    const cellStyle = {
+    const gameStatus = this.props.gameStatus;
+    const cellInfo = this.props.cellInfo;
+    let cellStyle = {
       margin: '1%',
       height: '125px',
       width: '30%',
-      border: '1px solid blue',
-      boxShadow: '2px 2px 0 darkblue',
-
-      ':hover': {
-        backgroundColor: 'aqua',
-        transition: '.5s'
+      border: '1px solid #eee',
+      transition: '.5s'
+    }
+    if (gameStatus === 'playing') {
+      cellStyle.cursor = 'pointer';
+      cellStyle.border = '1px solid blue';
+      cellStyle.boxShadow = '2px 2px 0 darkblue';
+      cellStyle[':hover'] = {
+        backgroundColor: 'aqua'
       }
     }
-    const cellInfo = this.props.cellInfo;
-    const currentPlayer = this.props.currentPlayer;
+    if (cellInfo.isWinningCell) {
+      cellStyle.backgroundColor = 'aqua';
+    }
 
     return (
       <div className="cell" onClick={() => this.handleClick(this.cellNum)} style={cellStyle}>
