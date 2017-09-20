@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import './css/styles.css';
-import { gameBoard, winners, getRandomNum } from './helpers';
+import { gameBoard, winners, getRandomInt } from './helpers';
 
 import Cell from './components/Cell';
 import Button from './components/Button';
@@ -27,8 +27,8 @@ class App extends Component {
     // If current player has a winning hand, show end state
   }
   handleClick(tile) {
-    let gameBoard = {...this.state.gameBoard};
-    gameBoard[tile] = this.state.currentPlayer;
+    let gameBoard = [...this.state.gameBoard];
+    gameBoard[tile].player = this.state.currentPlayer;
     const currentPlayer = this.state.currentPlayer === 'X' ? 'O' : 'X';
     this.setState({
       gameBoard,
@@ -44,21 +44,27 @@ class App extends Component {
     }
   }
   playComputerRound(currentPlayer, gameBoard) {
-    // Pick a new space not yet selected
-    let tile = 0;
-    while ((tile > Object.keys(gameBoard).length || tile <= 0) && gameBoard[tile] !== '') {
-      tile = getRandomNum();
+    // Determine if board is full
+    const boardFull = gameBoard.filter(cell => cell.player).length === 9;
+    if (boardFull) {
+      this.endGame();
     }
-    gameBoard[tile] = currentPlayer;
+    else {
+      let cell = getRandomInt();
+      while (gameBoard[cell].player.length) {
+        cell = getRandomInt();
+      }
+      gameBoard[cell].player = currentPlayer;
 
-    // See if the computer is a winner
-    this.checkForWinner(currentPlayer, gameBoard);
+      // See if the computer is a winner
+      this.checkForWinner(currentPlayer, gameBoard);
 
-    currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
-    this.setState({
-      gameBoard,
-      currentPlayer
-    });
+      currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+      this.setState({
+        gameBoard,
+        currentPlayer
+      });
+    }
   }
   switchGameState(text) {
     const playerChoice = text || null;
@@ -81,6 +87,7 @@ class App extends Component {
     }
   }
   endGame(currentPlayer) {
+    console.log('game is over');
     // Show an animation or strike through winning combo
     // Replace New Game button
   }
@@ -106,6 +113,7 @@ class App extends Component {
         transition: '.2s'
       }
     }
+
     let choiceButtonStyle = {...buttonStyle};
     // choiceButtonStyle['width'] = '100px';
 
@@ -136,17 +144,17 @@ class App extends Component {
     }
 
     return (
-
       <div className="App">
         <h1 className="title">Tic Tac Toe</h1>
         <div className="game-board">
-          {Object.keys(this.state.gameBoard)
+          {this.state.gameBoard
             .map((cell, i) => {
               return <Cell
-                {...this.state}
-                tileNum={i + 1}
-                key={i}
+                cellInfo={cell}
+                cellNum={i}
+                style={cell.style}
                 handleClick={this.handleClick}
+                key={i}
               />
             })
           }

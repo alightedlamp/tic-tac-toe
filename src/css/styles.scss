@@ -31,17 +31,6 @@ div.game-board {
   justify-content: space-between;
   margin: 0 auto;
 }
-div.game-board div.cell {
-  margin: 1%;
-  height: 125px;
-  width: 30%;
-  border: 1px solid blue;
-  box-shadow: 2px 2px 0 darkblue;
-}
-div.cell:hover {
-  background-color: aqua;
-  transition: .5s;
-}
 div.marker {
   text-align: center;
   font-size: 4em;
