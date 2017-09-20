@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import './css/styles.css';
-import { gameBoard, winners, getRandomInt } from './helpers';
+import { game, winners, getRandomInt } from './helpers';
 
 import Cell from './components/Cell';
 import Button from './components/Button';
@@ -10,9 +10,9 @@ class App extends Component {
     super();
 
     this.state = {
-      gameBoard: gameBoard,
-      currentPlayer: '',
-      gameState: 'idle',
+      game: game,
+      player: '',
+      gameStatus: 'idle',
       players: 1
     }
 
@@ -22,80 +22,90 @@ class App extends Component {
     this.endGame = this.endGame.bind(this);
     this.reset = this.reset.bind(this);
   }
-  checkForWinner(currentPlayer, gameBoard) {
+  checkForWinner(player, game) {
+    // Iterate `game` and build array with matching cell numbers
+    const cells = game.filter(cell => cell.player === player)
+                      .map(cell => cell.cell);
     // Compare current board against winners
     // If current player has a winning hand, show end state
   }
-  handleClick(tile) {
-    let gameBoard = [...this.state.gameBoard];
-    gameBoard[tile].player = this.state.currentPlayer;
-    const currentPlayer = this.state.currentPlayer === 'X' ? 'O' : 'X';
-    this.setState({
-      gameBoard,
-      currentPlayer
-    });
+  handleClick(cell) {
+    let game = [...this.state.game];
+    let player = this.state.player;
+    game[cell].player = player;
 
     // Check or a winner with new game board and current player
-    this.checkForWinner(currentPlayer, gameBoard);
+    this.checkForWinner(player, game);
+
+    player = player === 'X' ? 'O' : 'X';
+    this.setState({
+      game,
+      player
+    });
 
     // Let the computer play a round
-    if (this.state.gameState === 'playing' && this.state.players === 1) {
-      this.playComputerRound(currentPlayer, gameBoard);
+    if (this.state.gameStatus === 'playing' && this.state.players === 1) {
+      this.playComputerRound(player, game);
     }
   }
-  playComputerRound(currentPlayer, gameBoard) {
+  playComputerRound(player, game) {
     // Determine if board is full
-    const boardFull = gameBoard.filter(cell => cell.player).length === 9;
+    const boardFull = game.filter(cell => cell.player).length === 9;
     if (boardFull) {
       this.endGame();
     }
     else {
       let cell = getRandomInt();
-      while (gameBoard[cell].player.length) {
+      while (game[cell].player.length) {
         cell = getRandomInt();
       }
-      gameBoard[cell].player = currentPlayer;
+      game[cell].player = player;
 
       // See if the computer is a winner
-      this.checkForWinner(currentPlayer, gameBoard);
+      this.checkForWinner(player, game);
 
-      currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+      player = player === 'X' ? 'O' : 'X';
       this.setState({
-        gameBoard,
-        currentPlayer
+        game,
+        player
       });
     }
   }
   switchGameState(text) {
     const playerChoice = text || null;
 
-    switch (this.state.gameState) {
+    switch (this.state.gameStatus) {
       case ('idle'):
-        this.setState({ gameState: 'starting' });
+        this.setState({ gameStatus: 'starting' });
         break;
       case ('starting'):
         this.setState({
-          gameState: 'playing',
-          currentPlayer: playerChoice
+          gameStatus: 'playing',
+          player: playerChoice
         });
         break;
       default:
         // Something went wrong, go back to idle state
-        console.log('Starting game failed!');
-        this.setState({ gameState: 'idle' });
+        console.error('Starting game failed!');
+        this.setState({ gameStatus: 'idle' });
         break;
     }
   }
-  endGame(currentPlayer) {
-    console.log('game is over');
-    // Show an animation or strike through winning combo
+  endGame(player) {
+    // Handle if board is full and no winner
+    // If winner, change button style of winning cells
     // Replace New Game button
+    this.setState({
+      gameStatus: 'finished'
+    });
   }
   reset() {
+    // Board is not resetting since data structure refactor
+    const game = game;
     this.setState({
-      gameBoard,
-      currentPlayer: '',
-      gameState: 'idle'
+      game,
+      player: '',
+      gameStatus: 'idle'
      });
   }
   render() {
@@ -118,28 +128,28 @@ class App extends Component {
     // choiceButtonStyle['width'] = '100px';
 
     let info = '';
-    let gameState = '';
+    let gameStatus = '';
     let newGameButton = <Button text="New Game" style={buttonStyle} action={this.switchGameState} />;
     let playerChoiceButtons = <div className="player-choice"><Button text="X" style={choiceButtonStyle} action={this.switchGameState} /><Button text="O" style={choiceButtonStyle} action={this.switchGameState} /></div>;
 
-    switch(this.state.gameState) {
+    switch(this.state.gameStatus) {
       case ('idle'):
-        gameState = newGameButton;
+        gameStatus = newGameButton;
         info = 'Let\'s play a game!';
         break;
       case ('starting'):
-        gameState = playerChoiceButtons;
+        gameStatus = playerChoiceButtons;
         info = 'Which do you want to be?';
         break;
       case ('playing'):
-        gameState = `Current Player: ${this.state.currentPlayer}`;
+        gameStatus = `Current Player: ${this.state.player}`;
         break;
       case ('finished'):
-        info = `${this.state.currentPlayer} wins! Play again?`;
-        gameState = newGameButton;
+        info = `${this.state.player} wins! Play again?`;
+        gameStatus = newGameButton;
         break;
       default:
-        gameState = newGameButton;
+        gameStatus = newGameButton;
         break;
     }
 
@@ -147,7 +157,7 @@ class App extends Component {
       <div className="App">
         <h1 className="title">Tic Tac Toe</h1>
         <div className="game-board">
-          {this.state.gameBoard
+          {this.state.game
             .map((cell, i) => {
               return <Cell
                 cellInfo={cell}
@@ -168,7 +178,7 @@ class App extends Component {
             style={buttonStyle}
             action={this.reset}
           />
-          {gameState}
+          {gameStatus}
         </div>
       </div>
     );

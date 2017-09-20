@@ -1,4 +1,4 @@
-export const gameBoard = [
+export const game = [
   { cell: 1, player: '', isWinningCell: false },
   { cell: 2, player: '', isWinningCell: false },
   { cell: 3, player: '', isWinningCell: false },
@@ -19,4 +19,4 @@ export const winners = [
   [4, 5, 6],
   [7, 8, 9]
 ];
-export const getRandomInt = () => Math.floor(Math.random() * (8 - 0 + 1)) + 0;
+export const getRandomInt = () => Math.floor(Math.random() * 9);
