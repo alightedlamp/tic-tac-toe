@@ -23,11 +23,24 @@ class App extends Component {
     this.reset = this.reset.bind(this);
   }
   checkForWinner(player, game) {
+    console.log(game);
     // Iterate `game` and build array with matching cell numbers
     const cells = game.filter(cell => cell.player === player)
                       .map(cell => cell.cell);
     // Compare current board against winners
-    // If current player has a winning hand, show end state
+    const isWinner = winners.filter(seq => {
+      const [a, b, c] = seq;
+      if (cells.indexOf(a) >= 0 && cells.indexOf(b) >= 0 && cells.indexOf(c) >= 0) {
+        game[a - 1].isWinningCell = true;
+        game[b - 1].isWinningCell = true;
+        game[c - 1].isWinningCell = true;
+        return true;
+      }
+    });
+    if (isWinner.length > 0) {
+      this.setState({ game });
+      this.endGame(player, isWinner);
+    }
   }
   handleClick(cell) {
     let game = [...this.state.game];
@@ -91,10 +104,8 @@ class App extends Component {
         break;
     }
   }
-  endGame(player) {
+  endGame(player, isWinner) {
     // Handle if board is full and no winner
-    // If winner, change button style of winning cells
-    // Replace New Game button
     this.setState({
       gameStatus: 'finished'
     });
