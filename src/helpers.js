@@ -1,4 +1,4 @@
-export const game = [
+export const defaultBoard = [
   { cell: 1, player: '', isWinningCell: false },
   { cell: 2, player: '', isWinningCell: false },
   { cell: 3, player: '', isWinningCell: false },
@@ -11,7 +11,7 @@ export const game = [
 ];
 export const winners = [
   [1, 2, 3],
-  [1, 4, 6],
+  [1, 4, 7],
   [1, 5, 9],
   [2, 5, 8],
   [3, 6, 9],

@@ -28,6 +28,8 @@ class Cell extends React.Component {
     }
     if (cellInfo.isWinningCell) {
       cellStyle.backgroundColor = 'aqua';
+      cellStyle.border = '1px solid blue';
+      cellStyle.boxShadow = '2px 2px 0 darkblue';
     }
 
     return (

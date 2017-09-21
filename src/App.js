@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import './css/styles.css';
-import { game, winners, getRandomInt } from './helpers';
+import { defaultBoard, winners, getRandomInt } from './helpers';
 
 import Cell from './components/Cell';
 import Button from './components/Button';
@@ -10,7 +10,7 @@ class App extends Component {
     super();
 
     this.state = {
-      game: game,
+      board: defaultBoard,
       player: '',
       gameStatus: 'idle',
       players: 1
@@ -22,66 +22,76 @@ class App extends Component {
     this.endGame = this.endGame.bind(this);
     this.reset = this.reset.bind(this);
   }
-  checkForWinner(player, game) {
-    console.log(game);
+  checkForWinner(player, current) {
     // Iterate `game` and build array with matching cell numbers
-    const cells = game.filter(cell => cell.player === player)
-                      .map(cell => cell.cell);
+    const cells = current.filter(cell => cell.player === player)
+                         .map(cell => cell.cell);
     // Compare current board against winners
     const isWinner = winners.filter(seq => {
       const [a, b, c] = seq;
       if (cells.indexOf(a) >= 0 && cells.indexOf(b) >= 0 && cells.indexOf(c) >= 0) {
-        game[a - 1].isWinningCell = true;
-        game[b - 1].isWinningCell = true;
-        game[c - 1].isWinningCell = true;
+        current[a - 1].isWinningCell = true;
+        current[b - 1].isWinningCell = true;
+        current[c - 1].isWinningCell = true;
         return true;
       }
     });
     if (isWinner.length > 0) {
-      this.setState({ game });
-      this.endGame(player, isWinner);
+      this.setState({ current });
+      return true;
+    }
+    else {
+      return false;
     }
   }
   handleClick(cell) {
-    let game = [...this.state.game];
+    let current = [...this.state.board];
     let player = this.state.player;
-    game[cell].player = player;
+    current[cell].player = player;
 
     // Check or a winner with new game board and current player
-    this.checkForWinner(player, game);
+    if (this.checkForWinner(player, current)) {
+      this.endGame(player);
+    }
+    else {
+      player = player === 'X' ? 'O' : 'X';
+      this.setState({
+        current,
+        player
+      });
 
-    player = player === 'X' ? 'O' : 'X';
-    this.setState({
-      game,
-      player
-    });
-
-    // Let the computer play a round
-    if (this.state.gameStatus === 'playing' && this.state.players === 1) {
-      this.playComputerRound(player, game);
+      // Let the computer play a round
+      if (this.state.gameStatus === 'playing' && this.state.players === 1) {
+        setTimeout(function() {
+          this.playComputerRound(player, current)
+        }.bind(this), 1000);
+      }
     }
   }
-  playComputerRound(player, game) {
+  playComputerRound(player, current) {
     // Determine if board is full
-    const boardFull = game.filter(cell => cell.player).length === 9;
+    const boardFull = current.filter(cell => cell.player).length === 9;
     if (boardFull) {
       this.endGame();
     }
     else {
       let cell = getRandomInt();
-      while (game[cell].player.length) {
+      while (current[cell].player.length) {
         cell = getRandomInt();
       }
-      game[cell].player = player;
+      current[cell].player = player;
 
       // See if the computer is a winner
-      this.checkForWinner(player, game);
-
-      player = player === 'X' ? 'O' : 'X';
-      this.setState({
-        game,
-        player
-      });
+      if (this.checkForWinner(player, current)) {
+        this.endGame(player);
+      }
+      else {
+        player = player === 'X' ? 'O' : 'X';
+        this.setState({
+          current,
+          player
+        });
+      }
     }
   }
   switchGameState(text) {
@@ -97,10 +107,11 @@ class App extends Component {
           player: playerChoice
         });
         break;
+      case ('finished'):
+        this.reset();
+        break;
       default:
-        // Something went wrong, go back to idle state
-        console.error('Starting game failed!');
-        this.setState({ gameStatus: 'idle' });
+        this.setState({ gameStatus: 'error' });
         break;
     }
   }
@@ -111,12 +122,21 @@ class App extends Component {
     });
   }
   reset() {
-    // Board is not resetting since data structure refactor
-    const game = game;
+    const board = [
+      { cell: 1, player: '', isWinningCell: false },
+      { cell: 2, player: '', isWinningCell: false },
+      { cell: 3, player: '', isWinningCell: false },
+      { cell: 4, player: '', isWinningCell: false },
+      { cell: 5, player: '', isWinningCell: false },
+      { cell: 6, player: '', isWinningCell: false },
+      { cell: 7, player: '', isWinningCell: false },
+      { cell: 8, player: '', isWinningCell: false },
+      { cell: 9, player: '', isWinningCell: false }
+    ];
     this.setState({
-      game,
+      board,
       player: '',
-      gameStatus: 'idle'
+      gameStatus: 'starting'
      });
   }
   render() {
@@ -160,7 +180,7 @@ class App extends Component {
         gameStatus = newGameButton;
         break;
       default:
-        gameStatus = newGameButton;
+        gameStatus = 'Error in application!';
         break;
     }
 
@@ -168,7 +188,7 @@ class App extends Component {
       <div className="App">
         <h1 className="title">Tic Tac Toe</h1>
         <div className="game-board">
-          {this.state.game
+          {this.state.board
             .map((cell, i) => {
               return <Cell
                 cellInfo={cell}
