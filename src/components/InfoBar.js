@@ -46,8 +46,12 @@ class InfoBar extends React.Component {
       case ('playing'):
         info = `Current Player: ${player}`;
         break;
-      case ('finished'):
+      case ('winner'):
         info = `${player} wins! Play again?`;
+        option = newGameButton;
+        break;
+      case ('draw'):
+        info = 'Draw! Play again?';
         option = newGameButton;
         break;
       default:

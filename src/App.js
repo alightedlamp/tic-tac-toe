@@ -51,8 +51,9 @@ class App extends Component {
     current[cell].player = player;
 
     // Check or a winner with new game board and current player
-    if (this.checkForWinner(player, current)) {
-      this.endGame(player);
+    const isWinner = this.checkForWinner(player, current);
+    if (isWinner) {
+      this.endGame(player, isWinner);
     }
     else {
       player = player === 'X' ? 'O' : 'X';
@@ -73,7 +74,8 @@ class App extends Component {
     // Determine if board is full
     const boardFull = current.filter(cell => cell.player).length === 9;
     if (boardFull) {
-      this.endGame();
+      const isWinner = false;
+      this.endGame(isWinner);
     }
     else {
       let cell = getRandomInt();
@@ -83,8 +85,9 @@ class App extends Component {
       current[cell].player = player;
 
       // See if the computer is a winner
-      if (this.checkForWinner(player, current)) {
-        this.endGame(player);
+      const isWinner = this.checkForWinner(player, current);
+      if (isWinner) {
+        this.endGame(player, isWinner);
       }
       else {
         player = player === 'X' ? 'O' : 'X';
@@ -108,7 +111,10 @@ class App extends Component {
           player: playerChoice
         });
         break;
-      case ('finished'):
+      case ('winner'):
+        this.reset();
+        break;
+      case ('draw'):
         this.reset();
         break;
       default:
@@ -118,9 +124,12 @@ class App extends Component {
   }
   endGame(player, isWinner) {
     // Handle if board is full and no winner
-    this.setState({
-      gameStatus: 'finished'
-    });
+    if (isWinner) {
+      this.setState({ gameStatus: 'winner' });
+    }
+    else {
+      this.setState({ gameStatus: 'draw' });
+    }
   }
   reset() {
     // Hard reset because `defaultBoard` for some reason why pulling data from state -- weird
