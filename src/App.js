@@ -3,6 +3,7 @@ import './css/styles.css';
 import { defaultBoard, winners, getRandomInt } from './helpers';
 
 import Cell from './components/Cell';
+import InfoBar from './components/InfoBar';
 import Button from './components/Button';
 
 class App extends Component {
@@ -37,7 +38,7 @@ class App extends Component {
       }
     });
     if (isWinner.length > 0) {
-      this.setState({ current });
+      this.setState({ board: current });
       return true;
     }
     else {
@@ -122,6 +123,7 @@ class App extends Component {
     });
   }
   reset() {
+    // Hard reset because `defaultBoard` for some reason why pulling data from state -- weird
     const board = [
       { cell: 1, player: '', isWinningCell: false },
       { cell: 2, player: '', isWinningCell: false },
@@ -140,50 +142,6 @@ class App extends Component {
      });
   }
   render() {
-    const buttonStyle = {
-      padding: '1em',
-      border: '1px solid blue',
-      backgroundColor: 'blue',
-      color: 'white',
-
-      ':hover': {
-        border: '1px solid darkblue',
-        boxShadow: '3px 3px 0 darkblue',
-        backgroundColor: 'white',
-        color: 'darkblue',
-        transition: '.2s'
-      }
-    }
-
-    let choiceButtonStyle = {...buttonStyle};
-    // choiceButtonStyle['width'] = '100px';
-
-    let info = '';
-    let gameStatus = '';
-    let newGameButton = <Button text="New Game" style={buttonStyle} action={this.switchGameState} />;
-    let playerChoiceButtons = <div className="player-choice"><Button text="X" style={choiceButtonStyle} action={this.switchGameState} /><Button text="O" style={choiceButtonStyle} action={this.switchGameState} /></div>;
-
-    switch(this.state.gameStatus) {
-      case ('idle'):
-        gameStatus = newGameButton;
-        info = 'Let\'s play a game!';
-        break;
-      case ('starting'):
-        gameStatus = playerChoiceButtons;
-        info = 'Which do you want to be?';
-        break;
-      case ('playing'):
-        gameStatus = `Current Player: ${this.state.player}`;
-        break;
-      case ('finished'):
-        info = `${this.state.player} wins! Play again?`;
-        gameStatus = newGameButton;
-        break;
-      default:
-        gameStatus = 'Error in application!';
-        break;
-    }
-
     return (
       <div className="App">
         <h1 className="title">Tic Tac Toe</h1>
@@ -201,17 +159,12 @@ class App extends Component {
             })
           }
         </div>
-        <div className="info-bar">
-          {info}
-        </div>
-        <div className="controls">
-          <Button
-            text="Reset"
-            style={buttonStyle}
-            action={this.reset}
-          />
-          {gameStatus}
-        </div>
+        <InfoBar
+          player={this.state.player}
+          gameStatus={this.state.gameStatus}
+          switchGameState={this.switchGameState}
+          reset={this.reset}
+        />
       </div>
     );
   }
